@@ -6,23 +6,22 @@ from manimlib import *
 class Welcome(Scene):
     def construct(self):
         # Create text objects
-
-        manimText = Text("ManimGL", font_size=28).to_corner(RIGHT + UP)
+        manim_text = Text("ManimGL", font_size=28).to_corner(RIGHT + UP)
 
         title = Text(
             """
             دۇنياسىغا كەلگىنىڭىزنى قارشى ئالىمىز
             """
-            , font_size=28, font="ALKATIP Esliye").next_to(manimText, LEFT)
+            , font_size=28, font="ALKATIP Esliye").next_to(manim_text, LEFT)
         subtitle = Text("A Modern Approach to Mathematical Animations", font_size=24).next_to(title, DOWN)
 
         subtitle_ug = Text("ھازىرقى زامان ماتىماتىكىلىق كارتون ماتورى", font_size=28, font="ALKATIP Esliye").next_to(
             subtitle, DOWN)
 
         title.set_color_by_gradient(GREEN, YELLOW, BLUE, RED)
-        manimText.set_color_by_gradient(GREEN, YELLOW, BLUE, RED)
+        manim_text.set_color_by_gradient(GREEN, YELLOW, BLUE, RED)
 
-        self.play(Write(title, reverse=True, stroke_color=GREEN), Write(manimText, reverse=True, stroke_color=YELLOW))
+        self.play(Write(title, reverse=True, stroke_color=GREEN), Write(manim_text, reverse=True, stroke_color=YELLOW))
         self.play(Write(subtitle))
         subtitle_temp = subtitle.copy()
         self.play(Transform(subtitle_temp, subtitle_ug))
@@ -129,21 +128,10 @@ class SinAndCosFunctionPlot(Scene):
                         "line_to_number_buff": MED_SMALL_BUFF,
                     }
                     )
+        # create labels with x_tip and y_tip
         axes.add_coordinate_labels(font_size=10, num_decimal_places=1, x_tip=True, y_tip=True)
 
-        print(axes.get_origin())
-
         self.play(Write(axes, lag_ratio=0.01, run_time=1))
-        #
-        # t = axes.get_origin()[0] + float(((axes.get_all_ranges()[0])[1]))
-        #
-        # print(t)
-        #
-        # vec_x = VectorFrom(start=np.array([t, 0, 0]), end=np.array([t + 0.5, 0, 0]), stroke_width=2)
-        # vec_x.shift(UP * axes.get_origin()[1])
-        # self.add(vec_x)
-
-        # self.play(axes.animate.shift(UP * 3))
 
         # Axes.get_graph will return the graph of a function
         sin_graph = axes.get_graph(
@@ -163,12 +151,12 @@ class SinAndCosFunctionPlot(Scene):
         sin_label = axes.get_graph_label(sin_graph, "\\sin(x)")
         cos_label = axes.get_graph_label(cos_graph, "\\cos(x)")
 
-        dot = Dot(ORIGIN, color=RED)
-        self.add(dot)
+        dot = Dot(axes.get_origin(), fill_color=RED, radius=DEFAULT_SMALL_DOT_RADIUS)
+        self.play(FadeIn(dot))
 
-        line = Line(start=axes.get_origin() + UP, end=axes.get_origin() + DOWN)
-        line.shift(RIGHT * PI)
-        self.add(line)
+
+        circle = Circle(radius=1.0, color=YELLOW, arc_center=axes.get_origin())
+        self.play(ShowCreation(circle))
 
         self.play(
             ShowCreation(sin_graph),
@@ -176,8 +164,64 @@ class SinAndCosFunctionPlot(Scene):
             FadeIn(sin_label, RIGHT),
             FadeIn(cos_label, RIGHT),
         )
-        circle = Circle(radius=1.0, color=YELLOW, arc_center=axes.get_origin(), start_angle=PI)
-        self.play(ShowCreation(circle))
+
+
+        h_line = always_redraw(lambda: axes.get_h_line(dot.get_left()))
+        v_line = always_redraw(lambda: axes.get_v_line(dot.get_bottom()))
+
+        self.play(
+            ShowCreation(h_line),
+            ShowCreation(v_line),
+        )
+
+        # initiate an x-axis value tracker
+        x_tracker = ValueTracker(2)
+        f_always(
+            dot.move_to,
+            lambda: axes.i2gp(x_tracker.get_value(), sin_graph)
+        )
+
+        # save the current state of the camera
+        self.camera.frame.save_state()
+        # zoom the camera to the axes center
+        self.play(self.camera.frame.animate.scale(0.5).move_to(axes.get_origin()))
+
+        # move the dot along with x-axis to the point where circle and sin(x) intersect ~ approx
+        self.play(x_tracker.animate.set_value(0.7405039))
+        self.wait(2)
+
+        # reset the camera to original position
+        self.play(Restore(self.camera.frame))
+
+        # move the point to PI and return to coordinate center
+        self.play(x_tracker.animate.set_value(PI), run_time=2)
+        self.play(x_tracker.animate.set_value(0), run_time=3)
+
+        # rotate sin(x) and cos(x) for i-sin(x) i-cos(x) and remove original labels
+        self.play(sin_graph.animate.rotate(90*DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(sin_label))
+        self.play(cos_graph.animate.rotate(90*DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(cos_label))
+
+        # manipulate the new label
+        sin_label = axes.get_graph_label(sin_graph, "i\\sin(x)")
+        sin_label.move_to(LEFT * 5)
+        self.play(FadeIn(sin_label, LEFT))
+
+        cos_label = axes.get_graph_label(cos_graph, "i\\cos(x)")
+        cos_label.move_to(LEFT)
+        self.play(FadeIn(cos_label, RIGHT))
+
+        # remove or un-create objects
+        self.remove(h_line, v_line)
+
+        self.play(FadeOut(circle, shift=RIGHT), FadeOut(dot))
+
+        self.play(FadeOut(sin_label), FadeOut(cos_label), FadeOut(sin_graph), FadeOut(cos_graph))
+
+        self.play(Uncreate(axes))
+
+
+
+
 
 
 class PlayAll(Scene):

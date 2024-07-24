@@ -514,7 +514,13 @@ class Axes(VGroup, CoordinateSystem):
         x_tip = kwargs.get('x_tip', False)
         y_tip = kwargs.get('y_tip', False)
 
-
+        """
+        I add this here because if I make "include_tip": True in axis config
+        the whole object related to the axes will shit a little bit, and other
+        MObject on the axes will loose the precision
+        So I just add the minimum changes for my own need
+        Although this is not so beautiful when animating the creation of Axes
+        """
         if x_tip:
             t = self.get_origin()[0] + float(((self.get_all_ranges()[0])[1]))
             vec_x = VectorFrom(start=np.array([t, 0, 0]), end=np.array([t + 0.5, 0, 0]), stroke_width=2)

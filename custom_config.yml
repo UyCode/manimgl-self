@@ -1,0 +1,24 @@
+break_into_partial_movies: false
+camera_resolutions:
+  default_resolution: high
+  4k: 3840x2160
+  2k: 2560x1440
+  high: 1920x1080
+  low: 854x480
+  medium: 1280x720
+directories:
+  mirror_module_path: false
+  output: D:\manim-work\config\output
+  raster_images: D:\manim-work\config\images
+  sounds: D:\manim-work\config\sounds
+  temporary_storage: D:\manim-work\config\temp
+  vector_images: D:\manim-work\config\vector_images
+fps: 60
+full_screen: false
+style:
+  background_color: '#1F1F24'
+  font: Times New Roman
+  tex_template: default
+universal_import_line: from manimlib import *
+window_monitor: 0
+window_position: OO

@@ -87,7 +87,7 @@ class Welcome(Scene):
         self.play(ReplacementTransform(square, circle2))
 
         self.play(FadeOut(subtitle))
-        self.play(FadeOut(manimText), FadeOut(title))
+        self.play(FadeOut(manim_text), FadeOut(title))
 
         self.play(Uncreate(circle2))
         self.play(Uncreate(square2))

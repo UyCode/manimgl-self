@@ -1,3 +1,5 @@
+import tqdm
+
 from manimlib import *
 
 """
@@ -6,15 +8,11 @@ from manimlib import *
 """
 class Map(Scene):
     def construct(self):
-        map = SVGMobject("../media/map.svg", should_center=True);
+
+        map = SVGMobject(get_manim_dir() + "/media/world-white-2.svg", should_center=True, height=13, width=13)
 
         self.play(ShowCreation(map))
-        self.wait()
 
-        self.play(map.animate.scale(10))
-
-        self.play(map.animate.shift(DOWN * 8))
-
-        self.play(map.animate.shift(LEFT * 5))
-
-        self.play(map.animate.scale(2))
+        for i in range(100):
+            random_int = random.randint(0, len(MANIM_COLORS) - 1)
+            self.play(FadeToColor(map, MANIM_COLORS[random_int]), run_time=0.5)

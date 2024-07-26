@@ -140,7 +140,7 @@ class SinAndCosFunctionPlot(Scene):
         )
 
         cos_graph = axes.get_graph(
-            lambda x: math.cos(x),
+            lambda x: math.cos(x) * 2,
             color=GREEN,
         )
 

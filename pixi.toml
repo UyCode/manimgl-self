@@ -1,0 +1,13 @@
+[project]
+name = "manim"
+version = "0.1.0"
+description = "Add a short description here"
+authors = ["UyCode <Hyper-Hack@outlook.com>"]
+channels = ["conda-forge"]
+platforms = ["win-64"]
+
+[tasks]
+
+[dependencies]
+python = "==3.12"
+pip = ">=24.0,<25"

@@ -10,13 +10,14 @@ class Welcome(Scene):
 
 class CreateCoordinateSystem(Scene):
     def construct(self) -> None:
-        x_axis_config = dict(include_numbers=True, color=BLUE)
+        x_axis_config = dict(include_numbers=True, color=BLUE, line_to_number_buff=MED_SMALL_BUFF)
 
         plan = NumberPlane([-10, 10], [-10, 10], x_axis_config=x_axis_config)
+        plan.animate.shift(LEFT * plan.get_origin())
 
-        #plan.__setattr__("origin", ORIGIN)
-        print(plan.__getattribute__("origin"))
         self.play(ShowCreation(plan))
+
+        self.play(plan.animate.shift(LEFT * plan.get_origin()))
 
 
         line = Line(ORIGIN, 2 * RIGHT).set_color(RED)
@@ -30,23 +31,23 @@ class CreateCoordinateSystem(Scene):
         line_orignal_length = line.get_length()
         line3_orignal_length = line3.get_length()
 
-        line_a = Text("a", color=RED).next_to(line, DOWN)
-        line_c = Text("b", color=RED).next_to(line3, LEFT)
-        line_b = Text("c", color=RED).next_to(line2, RIGHT)
+        line_a = Tex("a", color=RED).next_to(line, DOWN)
+        line_c = Tex("b", color=RED).next_to(line3, LEFT)
+        line_b = Tex("c", color=RED).next_to(line2, RIGHT)
 
         self.play(Write(line_a))
-        self.play(Write(line_b))
         self.play(Write(line_c))
+        self.play(Write(line_b))
 
         # draw line a square
         line11 = Line(1 * DOWN, np.array([line.get_length() ** 2, -1, 0])).set_color(RED)
         self.play(Transform(line, line11))
-        line_a_square = Text("a²", color=RED).next_to(line11, DOWN)
+        line_a_square = Tex("a^2", color=RED).next_to(line11, DOWN)
         self.play(Transform(line_a, line_a_square))
 
         # draw line b square
         line22 = Line(1 * DOWN, np.array([-(line3.get_length() ** 2), -1, 0])).set_color(RED)
-        line_c_square = Text("b²", color=RED).next_to(line22, DOWN)
+        line_c_square = Tex("b^2", color=RED).next_to(line22, DOWN)
         self.play(Transform(line3, line22))
         self.play(Transform(line_c, line_c_square))
 
@@ -54,7 +55,7 @@ class CreateCoordinateSystem(Scene):
 
         line33 = Line(np.array([line_orignal_length ** 2, 0, 0]),
                       np.array([-(line3_orignal_length ** 2), 0, 0])).set_color(RED)
-        line_b_square = Text("c²", color=RED).next_to(line33, UP)
+        line_b_square = Tex("c^2", color=RED).next_to(line33, UP)
         self.play(Transform(line2, line33))
         self.play(Transform(line_b, line_b_square))
 

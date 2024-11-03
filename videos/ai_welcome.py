@@ -1,5 +1,3 @@
-import numpy as np
-
 from manimlib import *
 
 
@@ -140,7 +138,7 @@ class SinAndCosFunctionPlot(Scene):
         )
 
         cos_graph = axes.get_graph(
-            lambda x: math.cos(x) * 2,
+            lambda x: math.cos(x),
             color=GREEN,
         )
 
@@ -154,7 +152,6 @@ class SinAndCosFunctionPlot(Scene):
         dot = Dot(axes.get_origin(), fill_color=RED, radius=DEFAULT_SMALL_DOT_RADIUS)
         self.play(FadeIn(dot))
 
-
         circle = Circle(radius=1.0, color=YELLOW, arc_center=axes.get_origin())
         self.play(ShowCreation(circle))
 
@@ -162,9 +159,8 @@ class SinAndCosFunctionPlot(Scene):
             ShowCreation(sin_graph),
             ShowCreation(cos_graph),
             FadeIn(sin_label, RIGHT),
-            FadeIn(cos_label, RIGHT),
+            FadeIn(cos_label, RIGHT)
         )
-
 
         h_line = always_redraw(lambda: axes.get_h_line(dot.get_left()))
         v_line = always_redraw(lambda: axes.get_v_line(dot.get_bottom()))
@@ -175,11 +171,47 @@ class SinAndCosFunctionPlot(Scene):
         )
 
         # initiate an x-axis value tracker
-        x_tracker = ValueTracker(2)
+        x_tracker = ValueTracker(3)
         f_always(
             dot.move_to,
             lambda: axes.i2gp(x_tracker.get_value(), sin_graph)
         )
+
+        label_text_left, x_value, label_text_middle, y_value, label_text_right = label = VGroup(
+            Text("point(", font_size=20),
+            DecimalNumber(
+                x_tracker.get_value(),
+                show_ellipsis=False,
+                num_decimal_places=2,
+                include_sign=False,
+                font_size=18
+            ),
+            Text(",", font_size=20),
+            DecimalNumber(
+                math.sin(x_tracker.get_value()),
+                show_ellipsis=False,
+                num_decimal_places=2,
+                include_sign=False,
+                font_size=18
+            ),
+            Text(")", font_size=20),
+        )
+        label.next_to(LEFT * 3.7)
+        label_text_left.next_to(label)
+        x_value.next_to(label_text_left)
+        label_text_middle.next_to(x_value)
+        y_value.next_to(label_text_middle)
+        label_text_right.next_to(y_value)
+
+        f_always(
+            x_value.set_value,
+            lambda: x_tracker.get_value()
+        )
+        f_always(
+            y_value.set_value,
+            lambda: math.sin(x_tracker.get_value())
+        )
+        self.add(label)
 
         # save the current state of the camera
         self.camera.frame.save_state()
@@ -191,15 +223,17 @@ class SinAndCosFunctionPlot(Scene):
         self.wait(2)
 
         # reset the camera to original position
-        self.play(Restore(self.camera.frame))
+        self.play(Restore(self.camera.frame), label.animate.shift(RIGHT + UP))
 
         # move the point to PI and return to coordinate center
         self.play(x_tracker.animate.set_value(PI), run_time=2)
         self.play(x_tracker.animate.set_value(0), run_time=3)
 
+        self.play(FadeOut(label))
+
         # rotate sin(x) and cos(x) for i-sin(x) i-cos(x) and remove original labels
-        self.play(sin_graph.animate.rotate(90*DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(sin_label))
-        self.play(cos_graph.animate.rotate(90*DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(cos_label))
+        self.play(sin_graph.animate.rotate(90 * DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(sin_label))
+        self.play(cos_graph.animate.rotate(90 * DEGREES, axis=OUT, about_point=axes.get_origin()), FadeOut(cos_label))
 
         # manipulate the new label
         sin_label = axes.get_graph_label(sin_graph, "i\\sin(x)")
@@ -220,12 +254,26 @@ class SinAndCosFunctionPlot(Scene):
         self.play(Uncreate(axes))
 
 
-
-
+class TriangleProf(Scene):
+    def construct(self):
+        triangle = Polygon(
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            color=BLUE,
+            stroke_width=5,
+            fill_opacity=0.5,
+        )
+        self.play(ShowCreation(triangle))
+        self.wait(2)
+        self.play(FadeOut(triangle))
 
 
 class PlayAll(Scene):
-
     def construct(self):
         Welcome.construct(self)
         SinAndCosFunctionPlot.construct(self)
+        TriangleProf.construct(self)
+        # TriangleProof.CreateCoordinateSystem().construct(self)
+        print("""¯\\_(°ペ)_/¯""")
+        print("""¯\\_(ツ)_/¯""")
